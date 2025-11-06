@@ -1,0 +1,161 @@
+from pathlib import Path
+
+yaml_content = """# 🔥 Supercharged workflow for building, validating, and deploying a Jekyll site to GitHub Pages
+name: Build & Deploy (Jekyll • Pages • Supercharged)
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * 1"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  JEKYLL_ENV: production
+  BUNDLE_WITHOUT: "development"
+  BUNDLE_PATH: vendor/bundle
+
+jobs:
+  lint:
+    name: Lint (Markdown • YAML • Spelling)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node (for markdownlint)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+
+      - name: Install markdownlint-cli
+        run: npm i -g markdownlint-cli@0.41.0
+
+      - name: Run markdownlint
+        run: |
+          markdownlint "**/*.md" --ignore node_modules || true
+
+      - name: Install yamllint
+        run: sudo apt-get update && sudo apt-get install -y yamllint
+
+      - name: Run yamllint
+        run: |
+          yamllint -d "{extends: default, rules: {line-length: disable}}" . || true
+
+      - name: Setup Python (for codespell)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install codespell
+        run: pip install codespell==2.3.0
+
+      - name: Run codespell (non-blocking)
+        run: |
+          codespell -S "node_modules,vendor,_site,.git" || true
+
+  build:
+    name: Build (Jekyll)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Build with Jekyll (GitHub Pages dependencies preinstalled)
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Install HTMLProofer
+        run: |
+          gem install html-proofer -N
+
+      - name: Validate built site (HTMLProofer)
+        run: |
+          htmlproofer ./_site \
+            --assume-extension \
+            --check-html \
+            --check-img-http \
+            --enforce-https \
+            --url-ignore "/localhost|127\\.0\\.0\\.1/" \
+            --allow-missing-hreflang \
+            --http-status-ignore "0,999" \
+            --log-level info
+
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    name: Deploy to GitHub Pages (Production)
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  preview:
+    if: github.event_name == 'pull_request'
+    name: Deploy Preview (PR)
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy (Preview)
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          preview: true
+
+      - name: Comment PR with Preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = core.getInput('url') || '${{ steps.deployment.outputs.page_url }}';
+            const body = `🚀 **GitHub Pages Preview deployed!**\\n\\n🔗 ${url}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+          result-encoding: string
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+"""
+
+out_path = Path("/mnt/data/pages-jekyll-supercharged.yml")
+out_path.write_text(yaml_content, encoding="utf-8")
+
+out_path
