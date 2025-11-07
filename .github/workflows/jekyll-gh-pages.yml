@@ -143,3 +143,6 @@ jobs:
             });
           result-encoding: string
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+- name: Blog Post Workflow
+  uses: gautamkrishnar/blog-post-workflow@1.9.3
