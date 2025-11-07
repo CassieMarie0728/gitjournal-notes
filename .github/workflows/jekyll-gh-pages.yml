@@ -1,6 +1,4 @@
-from pathlib import Path
-
-yaml_content = """# 🔥 Supercharged workflow for building, validating, and deploying a Jekyll site to GitHub Pages
+# 🔥 Supercharged workflow for building, validating, and deploying a Jekyll site to GitHub Pages
 name: Build & Deploy (Jekyll • Pages • Supercharged)
 
 on:
@@ -96,15 +94,7 @@ jobs:
 
       - name: Validate built site (HTMLProofer)
         run: |
-          htmlproofer ./_site \
-            --assume-extension \
-            --check-html \
-            --check-img-http \
-            --enforce-https \
-            --url-ignore "/localhost|127\\.0\\.0\\.1/" \
-            --allow-missing-hreflang \
-            --http-status-ignore "0,999" \
-            --log-level info
+          htmlproofer ./_site             --assume-extension             --check-html             --check-img-http             --enforce-https             --url-ignore "/localhost|127\.0\.0\.1/"             --allow-missing-hreflang             --http-status-ignore "0,999"             --log-level info
 
       - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v3
@@ -144,7 +134,7 @@ jobs:
         with:
           script: |
             const url = core.getInput('url') || '${{ steps.deployment.outputs.page_url }}';
-            const body = `🚀 **GitHub Pages Preview deployed!**\\n\\n🔗 ${url}`;
+            const body = `🚀 **GitHub Pages Preview deployed!**\n\n🔗 ${url}`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -153,9 +143,3 @@ jobs:
             });
           result-encoding: string
           github-token: ${{ secrets.GITHUB_TOKEN }}
-"""
-
-out_path = Path("/mnt/data/pages-jekyll-supercharged.yml")
-out_path.write_text(yaml_content, encoding="utf-8")
-
-out_path
