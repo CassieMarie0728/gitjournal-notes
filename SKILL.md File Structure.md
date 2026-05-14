@@ -1,11 +1,11 @@
 ---
 created: 2026-05-14T13:30:42-05:00
-modified: 2026-05-14T13:31:24-05:00
+modified: 2026-05-14T13:32:05-05:00
 ---
 
 # SKILL.md File Structure
 
-Basic Structure
+**Basic Structure**
 At minimum, a skill is a folder with a SKILL.md file:
 
 my-skill/
