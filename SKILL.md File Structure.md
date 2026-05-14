@@ -1,6 +1,6 @@
 ---
 created: 2026-05-14T13:30:42-05:00
-modified: 2026-05-14T13:32:05-05:00
+modified: 2026-05-14T13:35:14-05:00
 ---
 
 # SKILL.md File Structure
@@ -10,30 +10,31 @@ At minimum, a skill is a folder with a SKILL.md file:
 
 my-skill/
 └── SKILL.md
-Full Structure
+
+**Full Structure**
 A complete skill can include multiple types of files:
 
 my-skill/
-├── SKILL.md              # Required: main instructions
-├── references/           # Optional: additional documentation
+├── SKILL.md                 # Required: main instructions
+├── references/             # Optional: additional documentation
 │   ├── api-guide.md
 │   ├── examples.md
 │   └── troubleshooting.md
-├── scripts/              # Optional: executable code
+├── scripts/                   # Optional: executable code
 │   ├── generate.py
 │   └── validate.sh
-├── templates/            # Optional: file templates
+├── templates/             # Optional: file templates
 │   ├── component.tsx.template
 │   └── test.spec.ts.template
-└── assets/               # Optional: static files
+└── assets/                   # Optional: static files
     ├── logo.png
     └── config.json
-Directory Purposes
-SKILL.md (Required)
-The main skill file containing:
 
-YAML frontmatter with metadata
-Markdown instructions for Claude
+**Directory Purposes**
+*SKILL.md* (Required)
+The main skill file containing:
+- YAML frontmatter with metadata
+- Markdown instructions for Claude
 ---
 name: my-skill
 description: What this skill does and when to use it.
