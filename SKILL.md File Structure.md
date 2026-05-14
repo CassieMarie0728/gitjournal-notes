@@ -1,6 +1,6 @@
 ---
 created: 2026-05-14T13:30:42-05:00
-modified: 2026-05-14T13:35:14-05:00
+modified: 2026-05-14T13:36:17-05:00
 ---
 
 # SKILL.md File Structure
@@ -35,6 +35,7 @@ my-skill/
 The main skill file containing:
 - YAML frontmatter with metadata
 - Markdown instructions for Claude
+
 ---
 name: my-skill
 description: What this skill does and when to use it.
